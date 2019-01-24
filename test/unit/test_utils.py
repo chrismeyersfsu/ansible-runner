@@ -12,6 +12,12 @@ from mock import patch
 from ansible_runner.utils import isplaybook, isinventory
 from ansible_runner.utils import dump_artifacts
 from ansible_runner.utils import OutputVerboseFilter
+from ansible_runner.utils import (
+    isplaybook,
+    isinventory,
+    dump_artifacts,
+    args2cmdline,
+)
 
 
 def test_isplaybook():
@@ -257,3 +263,13 @@ def test_verbose_line_buffering():
     assert len(events) == 6
 
     assert events[5]['event'] == 'EOF'
+
+
+def test_fifo_write():
+    pass
+
+
+def test_args2cmdline():
+    res = args2cmdline('ansible', '-m', 'setup', 'localhost')
+    assert res == 'ansible -m setup localhost'
+

@@ -10,6 +10,8 @@ import hashlib
 import tempfile
 import subprocess
 import base64
+import threading
+import pipes
 
 from collections import Iterable, Mapping
 try:
@@ -331,3 +333,17 @@ class OutputVerboseFilter(OutputEventFilter):
             # put final partial line back on buffer
             if remainder:
                 self._buffer.write(remainder)
+
+
+def open_fifo_write(path, data):
+    '''open_fifo_write opens the fifo named pipe in a new thread.
+    This blocks the thread until an external process (such as ssh-agent)
+    reads data from the pipe.
+    '''
+    os.mkfifo(path, stat.S_IRUSR | stat.S_IWUSR)
+    threading.Thread(target=lambda p, d: open(p, 'wb').write(d),
+                     args=(path, data)).start()
+
+
+def args2cmdline(*args):
+    return ' '.join([pipes.quote(a) for a in args])
